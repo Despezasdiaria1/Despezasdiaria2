@@ -43,8 +43,8 @@
     <!-- MAIN CONTENT -->
     <div id="app-content" class="flex-1 flex flex-col md:flex-row h-screen overflow-hidden w-full pb-[65px] md:pb-0 opacity-0 transition-opacity duration-700">
         
-        <!-- LEFT: CHAT AND AI ASSISTANT -->
-        <div id="tab-chat" class="w-full md:w-[420px] bg-white border-r border-slate-100 flex flex-col h-full relative z-20 shadow-xl md:shadow-none">
+        <!-- LEFT COLUMN: CHAT AND AI ASSISTANT -->
+        <div id="col-chat" class="w-full md:w-[420px] bg-white border-r border-slate-100 flex flex-col h-full relative z-20 shadow-xl md:shadow-none md:flex">
             <div class="glass-panel px-6 py-4 flex items-center justify-between border-b border-slate-100 shadow-sm">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center border border-indigo-100">
@@ -81,32 +81,32 @@
             </div>
         </div>
 
-        <!-- RIGHT: DASHBOARD & FINANCIAL ANALYTICS -->
-        <div class="flex-1 bg-[#f8fafc] flex flex-col h-full overflow-y-auto p-4 md:p-8 space-y-8">
-            
-            <!-- TOP DASHBOARD STATS -->
-            <div id="tab-dashboard" class="space-y-8 max-w-6xl mx-auto w-full">
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- RIGHT COLUMN: DASHBOARD & FINANCIAL ANALYTICS -->
+        <div id="col-dashboard" class="flex-1 bg-[#f8fafc] flex flex-col h-full overflow-y-auto p-4 md:p-8 space-y-8 md:flex">
+            <div class="max-w-6xl mx-auto w-full space-y-8">
+                
+                <!-- SECTION 1: TOP DASHBOARD STATS -->
+                <div id="sec-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:grid">
                     <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                         <span class="text-[10px] uppercase font-bold text-indigo-500 tracking-wider">Saldo Atual</span>
-                        <p id="total-balance" class="text-2xl font-bold mt-1 text-slate-800">$0.00</p>
+                        <p id="total-balance" class="text-xl md:text-2xl font-bold mt-1 text-slate-800">$0.00</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                         <span class="text-[10px] uppercase font-bold text-emerald-500 tracking-wider">Total Rendimentu</span>
-                        <p id="total-income" class="text-2xl font-bold mt-1 text-emerald-600">$0.00</p>
+                        <p id="total-income" class="text-xl md:text-2xl font-bold mt-1 text-emerald-600">$0.00</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                         <span class="text-[10px] uppercase font-bold text-rose-500 tracking-wider">Total Despeza</span>
-                        <p id="total-expense" class="text-2xl font-bold mt-1 text-rose-600">$0.00</p>
+                        <p id="total-expense" class="text-xl md:text-2xl font-bold mt-1 text-rose-600">$0.00</p>
                     </div>
                     <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                         <span class="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Tranzasaun</span>
-                        <p id="total-transactions" class="text-2xl font-bold mt-1 text-slate-800">0</p>
+                        <p id="total-transactions" class="text-xl md:text-2xl font-bold mt-1 text-slate-800">0</p>
                     </div>
                 </div>
 
-                <!-- CHARTS VISUALIZATION -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- SECTION 2: CHARTS VISUALIZATION -->
+                <div id="sec-charts" class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:grid">
                     <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm lg:col-span-2">
                         <h3 class="text-sm font-bold text-slate-700 mb-4">Grafiku Finanseiru (Gastu vs Rendimentu)</h3>
                         <div class="h-[250px] w-full"><canvas id="trendChart"></canvas></div>
@@ -116,11 +116,9 @@
                         <div class="h-[250px] w-full"><canvas id="categoryChart"></canvas></div>
                     </div>
                 </div>
-            </div>
 
-            <!-- FINANCE PLANNING TAB -->
-            <div id="tab-finance" class="space-y-6 max-w-6xl mx-auto w-full">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- SECTION 3: FINANCE PLANNING (Budget & Savings) -->
+                <div id="sec-planning" class="grid grid-cols-1 md:grid-cols-2 gap-6 md:grid">
                     <div class="bg-white p-6 rounded-2xl border border-slate-100 relative overflow-hidden shadow-sm">
                         <div class="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none z-0"><i data-lucide="wallet" class="w-32 h-32"></i></div>
                         <h3 class="text-sm font-bold text-slate-700 mb-4 relative z-10">Jestaun Orsamentu (Batas Pengeluaran)</h3>
@@ -143,61 +141,82 @@
                         <p id="savings-status" class="text-xs font-medium text-slate-500 relative z-10">Progresu tabungan 0%.</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- TABLE TAB WITH FILTERING -->
-            <div id="tab-table" class="bg-white border border-slate-100 rounded-2xl overflow-hidden max-w-6xl mx-auto w-full shadow-sm flex flex-col mb-10">
-                <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
-                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                        <i data-lucide="calendar-days" class="w-5 h-5 text-indigo-500"></i>
-                        Riwayat & Ringkasan
-                    </h3>
-                    <select id="filter-period" onchange="updateUI()" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 font-medium shadow-sm w-full sm:w-auto cursor-pointer transition-all">
-                        <option value="all">Tempu Hotu (Semua)</option>
-                        <option value="today">Ohin (Hari Ini)</option>
-                        <option value="week">Semana Ne'e (Minggu Ini)</option>
-                        <option value="month">Fulan Ne'e (Bulan Ini)</option>
-                    </select>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 p-5 bg-white border-b border-slate-100">
-                    <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] uppercase font-bold text-emerald-600 mb-1 tracking-wider">Rendimentu (Filter)</p>
-                            <p id="filter-income" class="text-xl font-bold text-emerald-700">$0.00</p>
-                        </div>
-                        <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center"><i data-lucide="trending-up" class="w-5 h-5"></i></div>
+                <!-- SECTION 4: TABLE TAB WITH FILTERING -->
+                <div id="sec-table" class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm flex flex-col md:flex mb-10">
+                    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="calendar-days" class="w-5 h-5 text-indigo-500"></i>
+                            Riwayat & Ringkasan
+                        </h3>
+                        <select id="filter-period" onchange="updateUI()" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 font-medium shadow-sm w-full sm:w-auto cursor-pointer transition-all">
+                            <option value="all">Tempu Hotu (Semua)</option>
+                            <option value="today">Ohin (Hari Ini)</option>
+                            <option value="week">Semana Ne'e (Minggu Ini)</option>
+                            <option value="month">Fulan Ne'e (Bulan Ini)</option>
+                        </select>
                     </div>
-                    <div class="p-4 bg-rose-50 rounded-xl border border-rose-100 flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] uppercase font-bold text-rose-600 mb-1 tracking-wider">Despeza (Filter)</p>
-                            <p id="filter-expense" class="text-xl font-bold text-rose-700">$0.00</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 p-5 bg-white border-b border-slate-100">
+                        <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex justify-between items-center">
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-emerald-600 mb-1 tracking-wider">Rendimentu (Filter)</p>
+                                <p id="filter-income" class="text-lg md:text-xl font-bold text-emerald-700">$0.00</p>
+                            </div>
+                            <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center"><i data-lucide="trending-up" class="w-5 h-5"></i></div>
                         </div>
-                        <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center"><i data-lucide="trending-down" class="w-5 h-5"></i></div>
+                        <div class="p-4 bg-rose-50 rounded-xl border border-rose-100 flex justify-between items-center">
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-rose-600 mb-1 tracking-wider">Despeza (Filter)</p>
+                                <p id="filter-expense" class="text-lg md:text-xl font-bold text-rose-700">$0.00</p>
+                            </div>
+                            <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center"><i data-lucide="trending-down" class="w-5 h-5"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50/80 border-b border-slate-100">
+                                <tr>
+                                    <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Data</th>
+                                    <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Kategoria</th>
+                                    <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Deskrisaun</th>
+                                    <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Folin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body" class="divide-y divide-slate-50">
+                                <!-- Injected dynamically by JS -->
+                            </tbody>
+                        </table>
+                        <div id="empty-state" class="hidden flex-col items-center justify-center p-10 text-slate-400">
+                            <i data-lucide="inbox" class="w-12 h-12 mb-3 opacity-50"></i>
+                            <p class="text-sm font-medium">La iha tranzasaun iha periodu ne'e.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-50/80 border-b border-slate-100">
-                            <tr>
-                                <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Data</th>
-                                <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Kategoria</th>
-                                <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Deskrisaun</th>
-                                <th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Folin</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactions-table-body" class="divide-y divide-slate-50">
-                            <!-- Injected dynamically by JS -->
-                        </tbody>
-                    </table>
-                    <div id="empty-state" class="hidden flex-col items-center justify-center p-10 text-slate-400">
-                        <i data-lucide="inbox" class="w-12 h-12 mb-3 opacity-50"></i>
-                        <p class="text-sm font-medium">La iha tranzasaun iha periodu ne'e.</p>
-                    </div>
-                </div>
             </div>
         </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 h-[65px] bg-white border-t border-slate-100 flex justify-around items-center z-50 px-4 shadow-lg">
+        <button onclick="setMobileTab('chat')" id="nav-chat" class="flex flex-col items-center justify-center text-indigo-600 transition-all flex-1 py-2">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold mt-1">Chat</span>
+        </button>
+        <button onclick="setMobileTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center text-slate-400 transition-all flex-1 py-2">
+            <i data-lucide="pie-chart" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium mt-1">Gráfiku</span>
+        </button>
+        <button onclick="setMobileTab('planning')" id="nav-planning" class="flex flex-col items-center justify-center text-slate-400 transition-all flex-1 py-2">
+            <i data-lucide="wallet" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium mt-1">Finansas</span>
+        </button>
+        <button onclick="setMobileTab('table')" id="nav-table" class="flex flex-col items-center justify-center text-slate-400 transition-all flex-1 py-2">
+            <i data-lucide="list" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium mt-1">Tabela</span>
+        </button>
     </div>
 
     <!-- CUSTOM INPUT MODAL (Replaces standard prompt) -->
@@ -252,6 +271,7 @@
         let currentInputCallback = null;
         let trendChartInstance = null;
         let categoryChartInstance = null;
+        let currentMobileTab = 'chat';
 
         // ONLOAD INITIALIZATION
         window.onload = () => {
@@ -273,12 +293,99 @@
             
             checkConnectionStatus();
             renderChat();
+            
+            // Set initial mobile tab view & render everything
+            setMobileTab('chat');
             updateUI();
 
             // Bind connection event listeners for visual network indicator status
             window.addEventListener('online', checkConnectionStatus);
             window.addEventListener('offline', checkConnectionStatus);
+            window.addEventListener('resize', () => {
+                setMobileTab(currentMobileTab);
+            });
         };
+
+        // MOBILE TAB NAVIGATION SWITCHER
+        function setMobileTab(tab) {
+            currentMobileTab = tab;
+            const isMobile = window.innerWidth < 768;
+            
+            // 1. Reset and style Bottom Nav buttons
+            const navs = ['chat', 'dashboard', 'planning', 'table'];
+            navs.forEach(n => {
+                const btn = document.getElementById(`nav-${n}`);
+                if (btn) {
+                    btn.className = "flex flex-col items-center justify-center text-slate-400 transition-all flex-1 py-2";
+                }
+            });
+            
+            const activeBtn = document.getElementById(`nav-${tab}`);
+            if (activeBtn) {
+                activeBtn.className = "flex flex-col items-center justify-center text-indigo-600 transition-all flex-1 py-2 scale-105 font-bold";
+            }
+
+            // 2. Control Layout Columns Visibility
+            const colChat = document.getElementById('col-chat');
+            const colDashboard = document.getElementById('col-dashboard');
+            
+            const secStats = document.getElementById('sec-stats');
+            const secCharts = document.getElementById('sec-charts');
+            const secPlanning = document.getElementById('sec-planning');
+            const secTable = document.getElementById('sec-table');
+
+            if (isMobile) {
+                // Mobile layout toggling
+                colChat.classList.add('hidden');
+                colDashboard.classList.add('hidden');
+                secStats.classList.add('hidden');
+                secCharts.classList.add('hidden');
+                secPlanning.classList.add('hidden');
+                secTable.classList.add('hidden');
+
+                if (tab === 'chat') {
+                    colChat.classList.remove('hidden');
+                    colChat.classList.add('flex');
+                } else {
+                    colDashboard.classList.remove('hidden');
+                    colDashboard.classList.add('flex');
+                    
+                    if (tab === 'dashboard') {
+                        secStats.classList.remove('hidden');
+                        secStats.classList.add('grid');
+                        secCharts.classList.remove('hidden');
+                        secCharts.classList.add('grid');
+                        // Redraw charts immediately to ensure fit within screen container width
+                        setTimeout(() => {
+                            if (state.transactions.length > 0) {
+                                updateUI();
+                            }
+                        }, 50);
+                    } else if (tab === 'planning') {
+                        secPlanning.classList.remove('hidden');
+                        secPlanning.classList.add('grid');
+                    } else if (tab === 'table') {
+                        secTable.classList.remove('hidden');
+                        secTable.classList.add('flex');
+                    }
+                }
+            } else {
+                // Desktop overrides: Keep everything shown
+                colChat.classList.remove('hidden');
+                colChat.classList.add('flex');
+                colDashboard.classList.remove('hidden');
+                colDashboard.classList.add('flex');
+                
+                secStats.classList.remove('hidden');
+                secStats.classList.add('grid');
+                secCharts.classList.remove('hidden');
+                secCharts.classList.add('grid');
+                secPlanning.classList.remove('hidden');
+                secPlanning.classList.add('grid');
+                secTable.classList.remove('hidden');
+                secTable.classList.add('flex');
+            }
+        }
 
         // NETWORK AND INTEGRATION LEVEL DETECTOR
         function checkConnectionStatus() {
