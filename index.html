@@ -482,29 +482,25 @@
             
             const txtL = text.toLowerCase();
             let type = 'expense';
-            let cat = 'Seluk-seluk';
+            let cat = 'Lain-lain';
 
-            // 1. Detect Income Patterns
-            if(/(salario|gaji|income|simu|terima|faan|osan-tama|bonus|komisun|rent|gaji|vende|venda)/i.test(txtL)) {
+            // 1. Detect Income Patterns (Tetum, Indo, PT, EN)
+            if(/(gaji|salario|income|simu|osan-tama|bonus|komisun|faan|vende|rendimento|vencimento|salary|jual|terima)/i.test(txtL)) {
                 type = 'income';
-                cat = 'Rendimentu';
+                cat = /(gaji|salario|bonus|komisun|vencimento|salary)/.test(txtL) ? 'Gaji' : 'Lain-lain';
             } else {
-                // 2. Detect Expense Categories (Strict priorities, custom words like "paun", "mina tein")
-                if(/(mina tein|minatein|paun|hahan|hemu|kopi|susu|ha|makan|minum|aihan|modo|foos|fos|ruti|roti|supermi|indomie|fehuk|koto|ovos|batar|ikan|naan|na'an|masin|midar|kafe)/.test(txtL)) {
-                    cat = 'Hahán/Hemu';
-                } 
-                else if(/(pulsa|internet|kuota|telemovel|telemor|telkomcel|tt|wifi|kreditu|xefe|paket)/.test(txtL)) {
-                    cat = 'Komunikasaun';
-                } 
-                else if(/(mina|bensin|solar|kareta|motor|transport|taxi|microlet|pasajen|pneu|roda)/.test(txtL)) {
-                    cat = 'Transporti';
-                } 
-                else if(/(roupa|sapatu|ropa|baju|vestuario|pantalon|pasta|relogio|sosa)/.test(txtL)) {
-                    cat = 'Sosa Sasán';
-                } 
-                else if(/(eskola|propina|doutor|klínika|moras|aimoruk|is-asin|konsulta|universidade|matrikula|ospital|farmasia|livru|kadernu)/.test(txtL)) {
-                    cat = 'Edukasaun/Saúde';
-                }
+                // 2. Detect Expense Categories (Tetum, Indo, PT, EN)
+                if(/(art|pembantu|bibi|kose uma|empregada|maid|asisten)/.test(txtL)) cat = 'ART';
+                else if(/(makan|dapur|hahán|hahan|ai-han|etu|hemu|paun|mina tein|fos|foos|modo|ikan|naan|na'an|masin|midar|kafe|roti|supermi|indomie|beras|koto|batar|ovos|food|drink|sayur|daging|kopi|susu|minum)/.test(txtL)) cat = 'Makan dan Dapur';
+                else if(/(bayi|bebe|pampers|susu bebe|popok|fralda|baby|minyak telon)/.test(txtL)) cat = 'Keperluan Bayi';
+                else if(/(listrik|ahi|edtl|token|eletricidade|electricity|eletrisidade)/.test(txtL)) cat = 'Listrik';
+                else if(/(air|bee|\bbe\b|btl|tanki|água|agua|water|bee moos)/.test(txtL)) cat = 'Air';
+                else if(/(internet|wifi|pulsa|telemor|telkomcel|tt|kuota|paket|data)/.test(txtL)) cat = 'Internet';
+                else if(/(rumah|uma|perabot|meja|kadeira|sabun|rinso|sabaun|fase|hamoos|house|kebutuhan|cleaning)/.test(txtL)) cat = 'Kebutuhan Rumah';
+                else if(/(perawatan|diri|salon|xampu|shampoo|tesi fuuk|roupa|sapatu|ropa|baju|vestuario|pantalon|faru|kalsa|hena|skincare|haircut)/.test(txtL)) cat = 'Perawatan Diri';
+                else if(/(hiburan|jajan|halimar|pasiar|nonton|sinema|cafe|snack|fuma|sigarru|jalan-jalan|passear|entertainment)/.test(txtL)) cat = 'Hiburan atau Jajan';
+                else if(/(tabungan|kofre|rai osan|simpan|poupança|saving|savings|deposit)/.test(txtL)) cat = 'Tabungan';
+                else if(/(mina|bensin|solar|kareta|motor|transport|taxi|microlet|pasajen|pneu|roda|angkot|ojek|gas|combustivel|gojek|grab)/.test(txtL)) cat = 'Transportasi';
             }
 
             // Clean input verbs to show beautiful text item names
@@ -514,7 +510,7 @@
                 .replace(/(sosa|selu|simu|terima|beli|gaji|salario)/gi, '')
                 .trim();
                 
-            itemClean = itemClean ? itemClean.charAt(0).toUpperCase() + itemClean.slice(1) : 'Gastu';
+            itemClean = itemClean ? itemClean.charAt(0).toUpperCase() + itemClean.slice(1) : (type === 'income' ? 'Rendimentu' : 'Gastu');
 
             return { valid: amt > 0, item: itemClean, amount: amt, category: cat, type: type };
         }
@@ -524,20 +520,32 @@
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) throw new Error("API Key config la iha");
 
-            const systemPrompt = `You are a professional financial transaction parser for Timor-Leste.
+            const systemPrompt = `You are a professional financial transaction parser.
+The user will input text mixed in Tetum, Indonesian, Portuguese, and English.
 Analyze the user transaction input and return STRICT JSON ONLY (do not include markdown block syntax like backticks, output raw text json).
-Rules for category assignment:
-- "Hahán/Hemu" for food, kitchen, cooking oil, mina tein, bread/paun, vegetables, water.
-- "Komunikasaun" for pulsa, internet data, telemor, telkomcel, wifi.
-- "Transporti" for petrol/bensin/mina, public transit, microlet, repair.
-- "Sosa Sasán" for clothes, general shopping, devices.
-- "Edukasaun/Saúde" for school fees/propina, doctor, medicine, clinic.
-- "Seluk-seluk" for miscellaneous.
+Rules for Category Assignment:
+INCOME categories:
+- "Gaji" for salary, wages, bonus, vencimento.
+- "Lain-lain" for other income like selling things, gifts.
 
-Type: "income" (for salario, simu, terima, faan/sell) or "expense" (for sosa, spending, selu).
+EXPENSE categories:
+- "ART" for maid, helper, cleaning service, pembantu, empregada, kose uma.
+- "Makan dan Dapur" for food, groceries, cooking oil, bread, vegetables, meat, hahán, foos, paun, mina tein, sayur.
+- "Keperluan Bayi" for pampers, popok, baby milk, baby items, fralda, susu bebe.
+- "Listrik" for electricity, EDTL, power tokens, ahi, eletricidade.
+- "Air" for water, BTL, water tank, bee moos, água, be, bee.
+- "Internet" for data quota, wifi, pulsa, telemor, telkomcel.
+- "Kebutuhan Rumah" for house supplies, furniture, laundry detergent, sabaun, sabun, uma, perabot.
+- "Perawatan Diri" for haircuts, salon, shampoo, clothes, shoes, tesi fuuk, ropa, faru, baju, skincare.
+- "Hiburan atau Jajan" for snacks, cinema, hanging out, cafe, pasiar, fuma, sigarru, jalan-jalan.
+- "Tabungan" for saving money, deposits, kofre, rai osan, simpan, saving, savings.
+- "Transportasi" for petrol, taxi, microlet, vehicle repair, bensin, mina, kareta, ojek.
+- "Lain-lain" for miscellaneous expenses.
+
+Type must be exactly: "income" or "expense".
 
 Return matching structure:
-{"valid": true, "item": "Cleaned brief item name in Tetun", "amount": 0.0, "category": "category", "type": "income/expense"}`;
+{"valid": true, "item": "Cleaned brief item name", "amount": 0.0, "category": "category", "type": "income/expense"}`;
 
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
@@ -703,7 +711,11 @@ Return matching structure:
 
             const catLabels = Object.keys(catData).length ? Object.keys(catData) : ['Seidauk iha Dadus'];
             const catValues = Object.values(catData).length ? Object.values(catData) : [1];
-            const catColors = Object.values(catData).length ? ['#6366f1', '#10b981', '#f43f5e', '#f59e0b', '#8b5cf6'] : ['#f1f5f9'];
+            const catColors = Object.values(catData).length ? [
+                '#6366f1', '#10b981', '#f43f5e', '#f59e0b', '#8b5cf6', 
+                '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#14b8a6', 
+                '#64748b', '#d946ef'
+            ] : ['#f1f5f9'];
 
             categoryChartInstance = new Chart(ctxCat.getContext('2d'), {
                 type: 'doughnut',
