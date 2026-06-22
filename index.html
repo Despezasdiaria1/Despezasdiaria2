@@ -540,7 +540,7 @@
                 
                 // Delete button logic for chat bubble
                 const btnHtml = `
-                    <button onclick="deleteMessage(${msg.id})" class="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all md:opacity-0 group-hover:opacity-100 flex-shrink-0" title="Hamos Chat/Dadus">
+                    <button onclick="deleteMessage(${msg.id})" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all md:opacity-0 group-hover:opacity-100 flex-shrink-0" title="Hamos Chat/Dadus">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 `;
@@ -879,14 +879,33 @@ Return matching structure:
                 const msg = state.messages.find(m => m.id === msgId);
                 if(!msg) return;
 
-                // If it's a Bot Message linking to a transaction -> Delete Transaction
-                if (msg.linkedTxId) {
-                    state.transactions = state.transactions.filter(t => t.id !== msg.linkedTxId);
-                }
-                // If it's a User Message -> Find & Delete the Transaction it spawned
-                state.transactions = state.transactions.filter(t => t.linkedMsgId !== msgId);
+                let txIdToDelete = null;
 
-                // Delete message itself
+                // Cari apakah chat ini punya kaitan dengan transaksi keuangan
+                if (msg.linkedTxId) {
+                    txIdToDelete = msg.linkedTxId;
+                } else {
+                    const linkedTx = state.transactions.find(t => t.linkedMsgId === msgId);
+                    if (linkedTx) txIdToDelete = linkedTx.id;
+                }
+
+                // Jika ada kaitannya, hapus SEMUA (Pesan User + Pesan Bot + Data Transaksi)
+                if (txIdToDelete) {
+                    const tx = state.transactions.find(t => t.id === txIdToDelete);
+                    if (tx) {
+                        const userMsgId = tx.linkedMsgId;
+                        // Hapus balasan bot
+                        state.messages = state.messages.filter(m => m.linkedTxId !== txIdToDelete);
+                        // Hapus pesan user
+                        if (userMsgId) {
+                            state.messages = state.messages.filter(m => m.id !== userMsgId);
+                        }
+                        // Hapus data dari grafik & tabel
+                        state.transactions = state.transactions.filter(t => t.id !== txIdToDelete);
+                    }
+                }
+
+                // Hapus pesan individu ini (berlaku untuk pesan error/sapaan awal)
                 state.messages = state.messages.filter(m => m.id !== msgId);
 
                 saveState();
@@ -898,9 +917,17 @@ Return matching structure:
         // 2. DELETE TRANSACTION FROM TABLE
         function deleteTransaction(txId) {
             openConfirmModal("Hamos Tranzasaun?", "Tranzasaun osan ne'e sei lakon permanentemente. Kontinua?", () => {
+                const tx = state.transactions.find(t => t.id === txId);
+                
                 state.transactions = state.transactions.filter(t => t.id !== txId);
-                // Also clean up bot message if it was linked
+                
+                // Bersihkan balasan bot di chat
                 state.messages = state.messages.filter(m => m.linkedTxId !== txId);
+                
+                // Bersihkan pesan user di chat
+                if (tx && tx.linkedMsgId) {
+                    state.messages = state.messages.filter(m => m.id !== tx.linkedMsgId);
+                }
                 
                 saveState();
                 renderChat();
