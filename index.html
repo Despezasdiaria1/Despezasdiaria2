@@ -64,10 +64,15 @@
                         </div>
                     </div>
                 </div>
-                <!-- Settings trigger button for Gemini Key -->
-                <button onclick="openSettingsModal()" class="w-9 h-9 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center border border-slate-100 transition-colors">
-                    <i data-lucide="settings" class="w-4 h-4"></i>
-                </button>
+                <!-- Action Buttons: Reset & Settings -->
+                <div class="flex items-center gap-2">
+                    <button onclick="confirmResetAll()" class="w-9 h-9 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center border border-rose-100 transition-colors" title="Mulai Ulang (Reset)">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="openSettingsModal()" class="w-9 h-9 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center border border-slate-100 transition-colors" title="Konfigurasaun">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                    </button>
+                </div>
             </div>
             
             <div id="chat-container" class="flex-1 p-5 overflow-y-auto space-y-2 bg-slate-50/50 flex flex-col">
@@ -1011,6 +1016,27 @@ Return matching structure:
         function executeConfirmAction() {
             if(confirmActionCallback) confirmActionCallback();
             closeConfirmModal();
+        }
+
+        function confirmResetAll() {
+            openConfirmModal("Mulai Ulang (Reset)", "Ita-boot tebes hakarak hamos dadus hotu (Chat, Tranzasaun, no Limite)? Asaun ne'e la bele kansela no aplikasaun sei hahú foun fali.", () => {
+                resetAllData();
+            });
+        }
+
+        function resetAllData() {
+            state.transactions = [];
+            state.categoryBudgets = {};
+            state.messages = [{
+                id: Date.now(),
+                sender: 'bot',
+                text: '👋 Ola! Ha\'u mak ita-nia Asistente Finanseiru Premium. Hatama despeza (Ezemplu: "Sosa mina tein 1.50$") ka rendimentu (Ezemplu: "Gaji fulan ne\'e $350").'
+            }];
+            localStorage.removeItem('despezas_diaria_state');
+            localStorage.removeItem('app_category_budgets');
+            saveState();
+            renderChat();
+            updateUI();
         }
 
         function openInputModal(title, callback) {
